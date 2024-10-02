@@ -1,13 +1,15 @@
 import { initializeApp } from "firebase/app";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import firebaseConfig from "./firebaseConfig.js";
-import { getAuth, signInWithEmailAndPassword } from "firebase/compat/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
-const Login = () => {
+const Login = ({ page }) => {
   const navigate = useNavigate();
   const app = initializeApp(firebaseConfig);
+  const auth = getAuth();
 
+  const [isuserExist, setUserExist] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const emailOnchangeHandler = (e) => {
@@ -19,13 +21,22 @@ const Login = () => {
 
   const onSignInHandler = (e) => {
     e.preventDefault();
-    navigate("/dashboard");
+    signInWithEmailAndPassword(auth, email, password)
+      .then((auth) => {
+        if (auth) {
+          navigate("/dashboard");
+        }
+      })
+      .catch((err) => {
+        setUserExist(true);
+        console.log(err);
+      });
   };
 
   return (
     <div className="login">
       <div className="holder">
-        <h1 className="text-white">Sign In</h1>
+        <h1 className="text-white">{page ? "Login" : "Register"}</h1>
         <br />
         <form>
           <input
@@ -46,39 +57,42 @@ const Login = () => {
             className="btn btn-danger btn-block"
             onClick={onSignInHandler}
           >
-            Sign In
+            {page ? "Login" : "Register"}
           </button>
           <br />
-          <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              value=""
-              id="flexCheckDefault"
-            />
-            <label
-              className="form-check-label text-white"
-              htmlFor="flexCheckDefault"
-            >
-              Remember Me
-            </label>
-          </div>
+          {app && (
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                value=""
+                id="flexCheckDefault"
+              />
+              <label
+                className="form-check-label text-white"
+                htmlFor="flexCheckDefault"
+              >
+                Remember Me
+              </label>
+            </div>
+          )}
         </form>
         <br />
         <br />
-        {/* {isUserExist && (
-            <p className="text-danger">User does not exist | Go for Signup</p>
-          )}
-          {isEmailUsed && (
+
+        {isuserExist && (
+          <p className="text-danger">User does not exist | Go for Signup</p>
+        )}
+        {/* {isEmailUsed && (
             <p className="text-danger">Email already in use | Go for Sign In</p>
           )} */}
         <div className="login-form-other">
           <div className="login-signup-now">
-            {/* {page ? "New to Netflix?" : "Existing User"} &nbsp;
-              <Link className=" " to={page ? "/register" : "/login"}>
-                {page ? "Sign up now" : "Sign In"}
-              </Link>
-              . */}
+            {page ? "New to Netflix?" : "Existing User?"} &nbsp;
+            <Link className=" " to={page ? "/register" : "/login"}>
+              {page ? "Sign up now" : "Sign In"}
+            </Link>
+            .
           </div>
         </div>
       </div>

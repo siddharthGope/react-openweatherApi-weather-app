@@ -20,7 +20,8 @@ function App() {
               </>
             }
           ></Route>
-          <Route path="/login" element={<Login />}></Route>
+          <Route path="/login" element={<Login page={true} />} />
+          <Route path="/register" element={<Login page={false} />} />
           <Route
             path="/dashboard"
             element={
