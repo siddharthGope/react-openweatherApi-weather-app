@@ -1,17 +1,30 @@
 import { initializeApp } from "firebase/app";
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import firebaseConfig from "./firebaseConfig.js";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
-const Login = ({ page }) => {
+const Login = () => {
+  //triggers
   const navigate = useNavigate();
   const app = initializeApp(firebaseConfig);
   const auth = getAuth();
+  const urlLocation = useLocation();
+  const page = urlLocation.pathname === "/login" ? true : false;
 
-  const [isuserExist, setUserExist] = useState(false);
+  //states
+  const [isEmailUsed, setUserRegistered] = useState(false);
+  const [isuserExist, setUserNotRegistered] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailValidate, setEmailValidate] = useState(true);
+  const [passwordValidate, setPasswordValidate] = useState(true);
+
+  //functions
   const emailOnchangeHandler = (e) => {
     setEmail(e.target.value);
   };
@@ -19,19 +32,53 @@ const Login = ({ page }) => {
     setPassword(e.target.value);
   };
 
-  const onSignInHandler = (e) => {
-    e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-      .then((auth) => {
-        if (auth) {
-          navigate("/dashboard");
-        }
-      })
-      .catch((err) => {
-        setUserExist(true);
-        console.log(err);
-      });
+  const validate = (fieldName, value) => {
+    switch (fieldName) {
+      case "email":
+        return value.match(/[^@]+@[^@]+\.[^@]+/i);
+      case "password":
+        return value.length >= 8;
+      default:
+        break;
+    }
   };
+
+  const ctaClickHandler = (e) => {
+    e.preventDefault();
+    if (!validate("email", email) || !validate("password", password)) {
+      setEmailValidate(validate("email", email));
+      setPasswordValidate(validate("password", password));
+      return;
+    }
+    if (page) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then((auth) => {
+          if (auth) {
+            navigate("/dashboard");
+          }
+        })
+        .catch((err) => {
+          setUserNotRegistered(true);
+          console.log(err.message);
+        });
+    } else {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((auth) => {
+          if (auth) {
+            navigate("/dashboard");
+          }
+        })
+        .catch((err) => {
+          console.log(err.message);
+          setUserRegistered(true);
+        });
+    }
+  };
+
+  useEffect(() => {
+    setUserRegistered(false);
+    setUserNotRegistered(false);
+  }, [urlLocation]);
 
   return (
     <div className="login">
@@ -46,6 +93,10 @@ const Login = ({ page }) => {
             placeholder="Email"
             onChange={emailOnchangeHandler}
           />
+          {!emailValidate && (
+            <p className="text-danger">Email is invalid/blank</p>
+          )}
+
           <input
             className="form-control"
             value={password}
@@ -53,9 +104,12 @@ const Login = ({ page }) => {
             placeholder="Password"
             onChange={passwordOnchangeHandler}
           />
+          {!passwordValidate && (
+            <p className="text-danger">Password is invalid/blank</p>
+          )}
           <button
             className="btn btn-danger btn-block"
-            onClick={onSignInHandler}
+            onClick={ctaClickHandler}
           >
             {page ? "Login" : "Register"}
           </button>
@@ -83,9 +137,9 @@ const Login = ({ page }) => {
         {isuserExist && (
           <p className="text-danger">User does not exist | Go for Signup</p>
         )}
-        {/* {isEmailUsed && (
-            <p className="text-danger">Email already in use | Go for Sign In</p>
-          )} */}
+        {isEmailUsed && (
+          <p className="text-danger">User exist | Go for Login</p>
+        )}
         <div className="login-form-other">
           <div className="login-signup-now">
             {page ? "New to Netflix?" : "Existing User?"} &nbsp;

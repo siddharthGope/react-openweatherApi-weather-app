@@ -1,13 +1,17 @@
 import React from "react";
 import logo from "../logo.svg";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const urlLocation = useLocation();
   const navigate = useNavigate();
-  const signIn = (e) => {
+
+  const signInHandler = (e) => {
     e.preventDefault();
     navigate("/login");
   };
+  const loggedIn = urlLocation.pathname === "/dashboard" ? true : false;
+
   return (
     <div>
       <header className="topNav">
@@ -23,8 +27,8 @@ const Header = () => {
                   <option>English</option>
                   <option>Hindi</option>
                 </select>
-                <button onClick={signIn} className="btn btn-danger">
-                  Signin
+                <button onClick={signInHandler} className="btn btn-danger">
+                  {loggedIn ? "Signout" : "Signin"}
                 </button>
               </form>
             </div>

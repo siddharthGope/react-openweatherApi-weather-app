@@ -20,27 +20,26 @@ function App() {
               </>
             }
           ></Route>
-          <Route path="/login" element={<Login page={true} />} />
-          <Route path="/register" element={<Login page={false} />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Login />} />
           <Route
             path="/dashboard"
             element={
               <>
                 <Header />
                 <Banner />
-                <List />
+                <List title="Trending Now" param="trending" />
+                <List title="Netflix Originals" param="originals" />
+                <List title="Now Playing" param="now_playing" />
+                <List title="Popular" param="popular" />
+                <List title="Top rated" param="top_rated" />
+                <List title="Upcoming" param="upcoming" />
               </>
             }
           ></Route>
         </Routes>
       </Router>
-      {/* <Header />
-      <HomeBanner />
-      <Login /> 
-      <Banner />
-      <List />*/}
     </div>
   );
 }
-
 export default App;
