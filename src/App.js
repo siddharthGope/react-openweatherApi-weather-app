@@ -1,44 +1,19 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.scss";
-import Banner from "./components/Banner";
-import List from "./components/List";
-import Header from "./components/Header";
-import HomeBanner from "./components/HomeBanner";
-import Login from "./components/Login";
+import Forecast from "./components/Forecast";
+import Inputs from "./components/Inputs";
+import TempAndDetails from "./components/TempAndDetails";
+import TimeAndLocation from "./components/TimeAndLocation";
+import TopButtons from "./components/TopButtons";
 
 function App() {
   return (
-    <div className="App">
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Header />
-                <HomeBanner />
-              </>
-            }
-          ></Route>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Login />} />
-          <Route
-            path="/dashboard"
-            element={
-              <>
-                <Header />
-                <Banner />
-                <List title="Trending Now" param="trending" />
-                <List title="Netflix Originals" param="originals" />
-                <List title="Now Playing" param="now_playing" />
-                <List title="Popular" param="popular" />
-                <List title="Top rated" param="top_rated" />
-                <List title="Upcoming" param="upcoming" />
-              </>
-            }
-          ></Route>
-        </Routes>
-      </Router>
+    <div className=" text-white mx-auto max-w-screen-lg mt-4 py-5 px-32 bg-gradient-to-br shadow-xl shadow-gray-400 from-cyan-600 to-blue-700">
+      <TopButtons />
+      <Inputs />
+      <TimeAndLocation />
+      <TempAndDetails />
+      <Forecast />
+      <Forecast />
     </div>
   );
 }
